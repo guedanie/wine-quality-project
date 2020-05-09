@@ -7,6 +7,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
 # ---------------------- #
 #        Modeling        #
@@ -76,4 +78,35 @@ def accuracy_report(model, y_pred, y_train):
     matrix = pd.DataFrame(confusion_matrix(y_train, y_pred), index = labels, columns = labels)
 
     return accuracy_score, matrix, report
+
+# ------------------ #
+#    Clustering      #
+# ------------------ #
+
+
+# Elbow code
+def create_elbow_graph(df, col):
+    '''
+    Function to draw and elbow graph. Takes a dataframe and the name of a column to create a cluster
+    '''
+    X = df[col]
+    with plt.style.context('seaborn-whitegrid'):
+        plt.figure(figsize=(9, 6))
+        pd.Series({k: KMeans(k).fit(X).inertia_ for k in range(2, 12)}).plot(marker='x')
+        plt.xticks(range(2, 12))
+        plt.xlabel('k')
+        plt.ylabel('inertia')
+        plt.title('Change in inertia as k increases')
+
+# Cluster
+def create_cluster(df, n_cluster, col, cluster_name):
+    '''
+    Function to cluster features. Takes a dataframe, the number of clusters and the columns to cluster by
+    '''
+    X = df[col]
+    kmeans = KMeans(n_clusters=n_cluster).fit(X)
+    centroid = kmeans.cluster_centers_
+    df[cluster_name] = kmeans.predict(X)
+    df[cluster_name] = 'cluster_' + (df[cluster_name] + 1).astype('str')
+    return df, centroid
     
