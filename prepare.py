@@ -46,6 +46,10 @@ def get_data_for_modeling():
     wines = pd.read_csv("wine-quality-red.csv")
     wines["mso2"] = wines["free sulfur dioxide"] / (1 + 10** (wines.pH - 1.81))
     wines = wines.drop(columns= "fixed acidity")
+
+    # Remove Outliers
+    wines = wines[wines["residual sugar"] < 12]
+    wines = wines[wines["total sulfur dioxide"] < 200]
     
     # Data split
     train, test = train_test_split(wines, random_state = 123, train_size=.8)
